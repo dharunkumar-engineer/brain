@@ -1,0 +1,16 @@
+{
+  "name": "final-app",
+  "version": "1.0.0",
+  "description": "Heart Disease Prediction App",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["heart", "disease", "prediction", "health"],
+  "author": "Your Name",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
