@@ -1,14 +1,20 @@
 {
-  "name": "final-app",
+  "name": "brain-tumor-detection-app",
   "version": "1.0.0",
-  "description": "Heart Disease Prediction App",
+  "description": "Brain Tumor Detection App using AI and Machine Learning",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js"
   },
-  "keywords": ["heart", "disease", "prediction", "health"],
-  "author": "Your Name",
+  "keywords": [
+    "brain",
+    "tumor",
+    "detection",
+    "ai",
+    "machine-learning",
+    "medical-imaging"
+  ],
+  "author": "Dharunkumar C",
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.2"
