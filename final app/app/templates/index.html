@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,12 +15,17 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+
             background: url('https://images.newscientist.com/wp-content/uploads/2018/06/15100753/gettyimages-168715138.jpg')
                 no-repeat center center fixed;
+
             background-size: cover;
+
             color: #ffffff;
+
             display: flex;
             flex-direction: column;
+
             min-height: 100vh;
         }
 
@@ -31,9 +37,13 @@
 
         .card {
             border-radius: 15px;
+
             background: rgba(255, 255, 255, 0.15);
+
             backdrop-filter: blur(10px);
+
             color: #ffffff;
+
             border: none;
         }
 
@@ -43,52 +53,83 @@
 
         .text-center h1 {
             font-size: 2rem;
+
             font-weight: bold;
+
             color: #ffffff;
+
             display: inline-block;
+
             padding: 5px;
         }
 
         .lead {
             margin-bottom: 20px;
+
             color: #ffffff;
         }
 
         .btn {
             width: 100%;
+
             background-color: #ff7eb3;
+
             border: none;
+
             color: #ffffff;
+
             padding: 12px;
+
             font-weight: bold;
+
+            border-radius: 8px;
         }
 
         .btn:hover {
             background-color: #ff5585;
+
             color: #ffffff;
         }
 
         .btn:disabled {
             opacity: 0.7;
+
+            cursor: not-allowed;
+        }
+
+        .form-control {
+            border-radius: 8px;
+        }
+
+        #results {
+            margin-top: 20px;
         }
 
         #results img {
             max-height: 300px;
-            margin-top: 10px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            border-radius: 10px;
-            box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.3);
-        }
 
-        .result-box {
-            margin-top: 20px;
+            max-width: 100%;
+
+            margin-top: 10px;
+
+            display: block;
+
+            margin-left: auto;
+
+            margin-right: auto;
+
+            border-radius: 10px;
+
+            box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.3);
         }
 
         .prediction {
             font-size: 1.4rem;
+
             font-weight: bold;
+
+            margin-top: 10px;
+
             margin-bottom: 10px;
         }
 
@@ -96,16 +137,235 @@
             font-size: 1.1rem;
         }
 
-        .error {
-            background: rgba(255, 0, 0, 0.25);
+        .error-message {
+            background: rgba(255, 0, 0, 0.3);
+
             border-radius: 10px;
+
             padding: 12px;
+
             margin-top: 15px;
+
+            color: #ffffff;
         }
 
         .footer {
             background-color: rgba(0, 0, 0, 0.3);
+
             color: white;
+
+            text-align: center;
+
+            padding: 10px 0;
+
+            margin-top: 20px;
+
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+
+<body>
+
+    <div class="container mt-5">
+
+        <!-- =========================
+             Heading
+        ========================== -->
+
+        <div class="text-center">
+
+            <h1 class="display-4">
+                Brain Tumor Detection
+            </h1>
+
+            <p class="lead">
+                Upload an MRI image to detect if there is a tumor and its type.
+            </p>
+
+        </div>
+
+
+        <!-- =========================
+             Upload Form
+        ========================== -->
+
+        <div class="card shadow p-4 mt-4">
+
+            <form
+                method="POST"
+                enctype="multipart/form-data"
+            >
+
+                <div class="mb-3">
+
+                    <label
+                        for="file"
+                        class="form-label"
+                    >
+                        Select MRI Image:
+                    </label>
+
+                    <input
+                        type="file"
+                        class="form-control"
+                        id="file"
+                        name="file"
+                        accept=".png,.jpg,.jpeg,image/png,image/jpeg"
+                        required
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="btn"
+                    id="predictButton"
+                >
+                    Upload and Detect
+                </button>
+
+            </form>
+
+
+            <!-- =========================
+                 Error / Flash Messages
+            ========================== -->
+
+            {% with messages = get_flashed_messages() %}
+
+                {% if messages %}
+
+                    <div class="error-message">
+
+                        {% for message in messages %}
+
+                            <div>
+                                {{ message }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% endif %}
+
+            {% endwith %}
+
+        </div>
+
+
+        <!-- =========================
+             Prediction Result
+        ========================== -->
+
+        {% if result %}
+
+            <div id="results">
+
+                <div class="card shadow">
+
+                    <div class="card-body text-center">
+
+                        <h4 class="card-title">
+                            Prediction Result
+                        </h4>
+
+
+                        <p class="prediction">
+                            {{ result }}
+                        </p>
+
+
+                        {% if confidence %}
+
+                            <p class="confidence">
+                                Confidence:
+                                <strong>
+                                    {{ confidence }}
+                                </strong>
+                            </p>
+
+                        {% endif %}
+
+
+                        <!-- Uploaded Image -->
+
+                        {% if file_path %}
+
+                            <div class="text-center">
+
+                                <img
+                                    src="{{ file_path }}"
+                                    class="img-fluid"
+                                    alt="Uploaded MRI Image"
+                                >
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- =========================
+         Footer
+    ========================== -->
+
+    <footer class="footer">
+
+        <p>
+            &copy; 2026 Brain Tumor Detection.
+            All Rights Reserved.
+        </p>
+
+        <p>
+            Team IT 43 Parul University
+        </p>
+
+    </footer>
+
+
+    <!-- =========================
+         JavaScript
+    ========================== -->
+
+    <script>
+
+        const form =
+            document.querySelector("form");
+
+        const button =
+            document.getElementById("predictButton");
+
+
+        form.addEventListener(
+            "submit",
+            function () {
+
+                button.disabled = true;
+
+                button.innerText =
+                    "Analyzing MRI... Please wait.";
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>            color: white;
             text-align: center;
             padding: 10px 0;
             margin-top: 20px;
