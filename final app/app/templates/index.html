@@ -15,17 +15,12 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-
             background: url('https://images.newscientist.com/wp-content/uploads/2018/06/15100753/gettyimages-168715138.jpg')
                 no-repeat center center fixed;
-
             background-size: cover;
-
             color: #ffffff;
-
             display: flex;
             flex-direction: column;
-
             min-height: 100vh;
         }
 
@@ -37,13 +32,9 @@
 
         .card {
             border-radius: 15px;
-
             background: rgba(255, 255, 255, 0.15);
-
             backdrop-filter: blur(10px);
-
             color: #ffffff;
-
             border: none;
         }
 
@@ -53,47 +44,34 @@
 
         .text-center h1 {
             font-size: 2rem;
-
             font-weight: bold;
-
             color: #ffffff;
-
             display: inline-block;
-
             padding: 5px;
         }
 
         .lead {
             margin-bottom: 20px;
-
             color: #ffffff;
         }
 
         .btn {
             width: 100%;
-
             background-color: #ff7eb3;
-
             border: none;
-
             color: #ffffff;
-
             padding: 12px;
-
             font-weight: bold;
-
             border-radius: 8px;
         }
 
         .btn:hover {
             background-color: #ff5585;
-
             color: #ffffff;
         }
 
         .btn:disabled {
             opacity: 0.7;
-
             cursor: not-allowed;
         }
 
@@ -107,29 +85,19 @@
 
         #results img {
             max-height: 300px;
-
             max-width: 100%;
-
             margin-top: 10px;
-
             display: block;
-
             margin-left: auto;
-
             margin-right: auto;
-
             border-radius: 10px;
-
             box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.3);
         }
 
         .prediction {
             font-size: 1.4rem;
-
             font-weight: bold;
-
             margin-top: 10px;
-
             margin-bottom: 10px;
         }
 
@@ -139,243 +107,25 @@
 
         .error-message {
             background: rgba(255, 0, 0, 0.3);
-
             border-radius: 10px;
-
             padding: 12px;
-
             margin-top: 15px;
-
             color: #ffffff;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 15px;
         }
 
         .footer {
             background-color: rgba(0, 0, 0, 0.3);
-
             color: white;
-
-            text-align: center;
-
-            padding: 10px 0;
-
-            margin-top: 20px;
-
-            font-size: 14px;
-        }
-    </style>
-</head>
-
-
-<body>
-
-    <div class="container mt-5">
-
-        <!-- =========================
-             Heading
-        ========================== -->
-
-        <div class="text-center">
-
-            <h1 class="display-4">
-                Brain Tumor Detection
-            </h1>
-
-            <p class="lead">
-                Upload an MRI image to detect if there is a tumor and its type.
-            </p>
-
-        </div>
-
-
-        <!-- =========================
-             Upload Form
-        ========================== -->
-
-        <div class="card shadow p-4 mt-4">
-
-            <form
-                method="POST"
-                enctype="multipart/form-data"
-            >
-
-                <div class="mb-3">
-
-                    <label
-                        for="file"
-                        class="form-label"
-                    >
-                        Select MRI Image:
-                    </label>
-
-                    <input
-                        type="file"
-                        class="form-control"
-                        id="file"
-                        name="file"
-                        accept=".png,.jpg,.jpeg,image/png,image/jpeg"
-                        required
-                    >
-
-                </div>
-
-
-                <button
-                    type="submit"
-                    class="btn"
-                    id="predictButton"
-                >
-                    Upload and Detect
-                </button>
-
-            </form>
-
-
-            <!-- =========================
-                 Error / Flash Messages
-            ========================== -->
-
-            {% with messages = get_flashed_messages() %}
-
-                {% if messages %}
-
-                    <div class="error-message">
-
-                        {% for message in messages %}
-
-                            <div>
-                                {{ message }}
-                            </div>
-
-                        {% endfor %}
-
-                    </div>
-
-                {% endif %}
-
-            {% endwith %}
-
-        </div>
-
-
-        <!-- =========================
-             Prediction Result
-        ========================== -->
-
-        {% if result %}
-
-            <div id="results">
-
-                <div class="card shadow">
-
-                    <div class="card-body text-center">
-
-                        <h4 class="card-title">
-                            Prediction Result
-                        </h4>
-
-
-                        <p class="prediction">
-                            {{ result }}
-                        </p>
-
-
-                        {% if confidence %}
-
-                            <p class="confidence">
-                                Confidence:
-                                <strong>
-                                    {{ confidence }}
-                                </strong>
-                            </p>
-
-                        {% endif %}
-
-
-                        <!-- Uploaded Image -->
-
-                        {% if file_path %}
-
-                            <div class="text-center">
-
-                                <img
-                                    src="{{ file_path }}"
-                                    class="img-fluid"
-                                    alt="Uploaded MRI Image"
-                                >
-
-                            </div>
-
-                        {% endif %}
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        {% endif %}
-
-    </div>
-
-
-    <!-- =========================
-         Footer
-    ========================== -->
-
-    <footer class="footer">
-
-        <p>
-            &copy; 2026 Brain Tumor Detection.
-            All Rights Reserved.
-        </p>
-
-        <p>
-            Team IT 43 Parul University
-        </p>
-
-    </footer>
-
-
-    <!-- =========================
-         JavaScript
-    ========================== -->
-
-    <script>
-
-        const form =
-            document.querySelector("form");
-
-        const button =
-            document.getElementById("predictButton");
-
-
-        form.addEventListener(
-            "submit",
-            function () {
-
-                button.disabled = true;
-
-                button.innerText =
-                    "Analyzing MRI... Please wait.";
-
-            }
-        );
-
-    </script>
-
-</body>
-
-</html>            color: white;
             text-align: center;
             padding: 10px 0;
             margin-top: 20px;
             font-size: 14px;
-        }
-
-        #loading {
-            display: none;
-            text-align: center;
-            margin-top: 15px;
         }
     </style>
 </head>
@@ -384,27 +134,33 @@
 
 <div class="container mt-5">
 
+    <!-- Heading -->
     <div class="text-center">
-        <h1 class="display-4">Brain Tumor Detection</h1>
+        <h1 class="display-4">
+            Brain Tumor Detection
+        </h1>
 
         <p class="lead">
             Upload an MRI image to detect if there is a tumor and its type.
         </p>
     </div>
 
+
     <!-- Upload Form -->
     <div class="card shadow p-4 mt-4">
 
         <form
-            id="predictionForm"
-            action="/predict"
             method="POST"
             enctype="multipart/form-data"
+            id="predictionForm"
         >
 
             <div class="mb-3">
 
-                <label for="file" class="form-label">
+                <label
+                    for="file"
+                    class="form-label"
+                >
                     Select MRI Image:
                 </label>
 
@@ -413,7 +169,7 @@
                     class="form-control"
                     id="file"
                     name="file"
-                    accept="image/*"
+                    accept=".png,.jpg,.jpeg,image/png,image/jpeg"
                     required
                 >
 
@@ -429,284 +185,133 @@
 
         </form>
 
+
         <!-- Loading -->
-        <div id="loading">
+        <div
+            id="loading"
+            class="loading"
+        >
             <p>Analyzing MRI image... Please wait.</p>
         </div>
 
-        <!-- Error -->
-        <div
-            id="errorMessage"
-            class="error"
-            style="display:none;"
-        ></div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages() %}
+
+            {% if messages %}
+
+                <div class="error-message">
+
+                    {% for message in messages %}
+
+                        <div>
+                            {{ message }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+        {% endwith %}
 
     </div>
 
 
     <!-- Prediction Result -->
-    <div
-        id="results"
-        class="result-box"
-        style="display:none;"
-    >
 
-        <div class="card shadow">
+    {% if result %}
 
-            <div class="card-body text-center">
+        <div id="results">
 
-                <h4 class="card-title">
-                    Prediction Result
-                </h4>
+            <div class="card shadow">
 
-                <p
-                    id="prediction"
-                    class="prediction"
-                ></p>
+                <div class="card-body text-center">
 
-                <p
-                    id="confidence"
-                    class="confidence"
-                ></p>
+                    <h4 class="card-title">
+                        Prediction Result
+                    </h4>
 
-                <img
-                    id="previewImage"
-                    class="img-fluid"
-                    alt="Uploaded MRI Image"
-                >
+                    <p class="prediction">
+                        {{ result }}
+                    </p>
+
+
+                    {% if confidence %}
+
+                        <p class="confidence">
+                            Confidence:
+                            <strong>{{ confidence }}</strong>
+                        </p>
+
+                    {% endif %}
+
+
+                    {% if file_path %}
+
+                        <div class="text-center">
+
+                            <img
+                                src="{{ file_path }}"
+                                class="img-fluid"
+                                alt="Uploaded MRI Image"
+                            >
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
 
             </div>
 
         </div>
 
-    </div>
+    {% endif %}
 
 </div>
 
 
 <!-- Footer -->
+
 <footer class="footer">
 
-    <p>&copy; 2026 Brain Tumor Detection. All Rights Reserved.</p>
+    <p>
+        &copy; 2026 Brain Tumor Detection.
+        All Rights Reserved.
+    </p>
 
-    <p>Team IT 43 Parul University</p>
+    <p>
+        Team IT 43 Parul University
+    </p>
 
 </footer>
 
 
+<!-- JavaScript -->
+
 <script>
 
-document
-    .getElementById("predictionForm")
-    .addEventListener("submit", async function(event) {
+const form = document.getElementById("predictionForm");
 
-        event.preventDefault();
+const button = document.getElementById("predictButton");
 
-        const form = event.target;
+const loading = document.getElementById("loading");
 
-        const fileInput = document.getElementById("file");
 
-        const button = document.getElementById("predictButton");
+form.addEventListener("submit", function () {
 
-        const loading = document.getElementById("loading");
+    button.disabled = true;
 
-        const results = document.getElementById("results");
+    button.innerText = "Analyzing MRI...";
 
-        const errorMessage = document.getElementById("errorMessage");
+    loading.style.display = "block";
 
-        const prediction = document.getElementById("prediction");
-
-        const confidence = document.getElementById("confidence");
-
-        const previewImage = document.getElementById("previewImage");
-
-
-        // Reset messages
-
-        errorMessage.style.display = "none";
-
-        results.style.display = "none";
-
-
-        // Check file
-
-        if (!fileInput.files || fileInput.files.length === 0) {
-
-            errorMessage.innerText =
-                "Please select an MRI image first.";
-
-            errorMessage.style.display = "block";
-
-            return;
-
-        }
-
-
-        const file = fileInput.files[0];
-
-
-        // Show selected image immediately
-
-        previewImage.src = URL.createObjectURL(file);
-
-
-        // Show loading
-
-        button.disabled = true;
-
-        button.innerText = "Analyzing...";
-
-        loading.style.display = "block";
-
-
-        // Prepare form data
-
-        const formData = new FormData();
-
-        formData.append("file", file);
-
-
-        try {
-
-            console.log("Sending image to /predict...");
-
-
-            const response = await fetch("/predict", {
-
-                method: "POST",
-
-                body: formData
-
-            });
-
-
-            console.log(
-                "Prediction response status:",
-                response.status
-            );
-
-
-            // Check HTTP response
-
-            if (!response.ok) {
-
-                const errorText = await response.text();
-
-                throw new Error(
-                    "Server error (" +
-                    response.status +
-                    "): " +
-                    errorText
-                );
-
-            }
-
-
-            const contentType =
-                response.headers.get("content-type") || "";
-
-
-            // If Flask returns JSON
-
-            if (contentType.includes("application/json")) {
-
-                const data = await response.json();
-
-                console.log("Prediction response:", data);
-
-
-                if (data.error) {
-
-                    throw new Error(data.error);
-
-                }
-
-
-                prediction.innerText =
-                    data.result ||
-                    data.prediction ||
-                    data.class ||
-                    "Prediction received";
-
-
-                confidence.innerText =
-                    data.confidence
-                        ? "Confidence: " + data.confidence
-                        : "";
-
-
-                results.style.display = "block";
-
-
-            } else {
-
-                // If Flask returns an HTML page
-
-                const html = await response.text();
-
-                console.log(
-                    "Server returned HTML response."
-                );
-
-
-                document.open();
-
-                document.write(html);
-
-                document.close();
-
-            }
-
-
-        } catch (error) {
-
-            console.error(
-                "Prediction error:",
-                error
-            );
-
-
-            errorMessage.innerText =
-                "Prediction failed: " +
-                error.message;
-
-
-            errorMessage.style.display =
-                "block";
-
-
-        } finally {
-
-            button.disabled = false;
-
-            button.innerText =
-                "Upload and Detect";
-
-            loading.style.display =
-                "none";
-
-        }
-
-    });
+});
 
 </script>
 
 </body>
-</html                    <h4 class="card-title">{{ result }}</h4>
-                    <p class="card-text">Confidence: {{ confidence }}</p>
-                    <div class="text-center">
-                        <img src="{{ file_path }}" class="img-fluid" alt="Uploaded Image">
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-    </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <p>&copy; 2025 Brain Tumor Detection. All Rights Reserved.</p>
-        </p> Team IT 43 Parul University </p>
-    </footer>
-</body>
 </html>
