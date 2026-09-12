@@ -2,9 +2,9 @@
   "name": "brain-tumor-detection-app",
   "version": "1.0.0",
   "description": "Brain Tumor Detection App using AI and Machine Learning",
-  "main": "app.js",
+  "main": "main.py",
   "scripts": {
-    "start": "node app.js"
+    "start": "gunicorn main:app"
   },
   "keywords": [
     "brain",
@@ -12,11 +12,11 @@
     "detection",
     "ai",
     "machine-learning",
-    "medical-imaging"
+    "medical-imaging",
+    "flask",
+    "tensorflow",
+    "postgresql"
   ],
   "author": "Dharunkumar C",
-  "license": "ISC",
-  "dependencies": {
-    "express": "^4.18.2"
-  }
+  "license": "ISC"
 }
