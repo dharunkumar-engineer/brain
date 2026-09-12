@@ -36,7 +36,10 @@ from werkzeug.utils import secure_filename
 
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.styles import (
+    getSampleStyleSheet,
+    ParagraphStyle
+)
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.units import inch
 from reportlab.platypus import (
@@ -56,9 +59,13 @@ from PIL import Image
 # =========================
 
 try:
+
     tf.config.threading.set_intra_op_parallelism_threads(1)
+
     tf.config.threading.set_inter_op_parallelism_threads(1)
+
 except Exception:
+
     pass
 
 
@@ -73,41 +80,50 @@ app.secret_key = os.environ.get(
     "brain-tumor-secret-key"
 )
 
+
 BASE_DIR = os.path.dirname(
     os.path.abspath(__file__)
 )
+
 
 UPLOAD_FOLDER = os.path.join(
     BASE_DIR,
     "uploads"
 )
 
+
 REPORT_FOLDER = os.path.join(
     BASE_DIR,
     "reports"
 )
+
 
 DATABASE_PATH = os.path.join(
     BASE_DIR,
     "brain_tumor.db"
 )
 
+
 os.makedirs(
     UPLOAD_FOLDER,
     exist_ok=True
 )
+
 
 os.makedirs(
     REPORT_FOLDER,
     exist_ok=True
 )
 
+
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
 app.config["REPORT_FOLDER"] = REPORT_FOLDER
 
 app.config["MAX_CONTENT_LENGTH"] = (
     10 * 1024 * 1024
 )
+
 
 ALLOWED_EXTENSIONS = {
     "png",
@@ -125,6 +141,7 @@ MODEL_PATH = os.path.join(
     "models",
     "model.h5"
 )
+
 
 if not os.path.exists(MODEL_PATH):
 
@@ -155,6 +172,7 @@ try:
 except Exception as e:
 
     print("MODEL LOADING ERROR")
+
     print(str(e))
 
     traceback.print_exc()
@@ -173,10 +191,22 @@ class_labels = [
     "meningioma"
 ]
 
+
 print(
     "Class labels:",
     class_labels
 )
+
+
+# =========================
+# Model Accuracy
+# =========================
+
+# Fixed model evaluation accuracy.
+# This is the only model metric displayed
+# on the dashboard.
+
+MODEL_ACCURACY = "96.9"
 
 
 # =========================
@@ -249,7 +279,8 @@ def allowed_file(filename):
         return False
 
     return (
-        "." in filename
+        "."
+        in filename
         and filename.rsplit(
             ".",
             1
@@ -267,8 +298,16 @@ def predict_tumor(image_path):
     try:
 
         print("--------------------------------")
-        print("Starting prediction...")
-        print("Image path:", image_path)
+
+        print(
+            "Starting prediction..."
+        )
+
+        print(
+            "Image path:",
+            image_path
+        )
+
 
         # -------------------------
         # Get model input size
@@ -282,12 +321,14 @@ def predict_tumor(image_path):
             model.input_shape[2]
         )
 
+
         print(
             "Required image size:",
             image_width,
             "x",
             image_height
         )
+
 
         # -------------------------
         # Load image
@@ -302,20 +343,26 @@ def predict_tumor(image_path):
             color_mode="rgb"
         )
 
+
         print(
             "Image loaded successfully."
         )
+
 
         # -------------------------
         # Convert image to array
         # -------------------------
 
-        img_array = img_to_array(img)
+        img_array = img_to_array(
+            img
+        )
+
 
         print(
             "Original array shape:",
             img_array.shape
         )
+
 
         # -------------------------
         # Normalize
@@ -326,7 +373,11 @@ def predict_tumor(image_path):
             dtype=np.float32
         )
 
-        img_array = img_array / 255.0
+
+        img_array = (
+            img_array / 255.0
+        )
+
 
         # -------------------------
         # Add batch dimension
@@ -337,10 +388,12 @@ def predict_tumor(image_path):
             axis=0
         )
 
+
         print(
             "Final model input shape:",
             img_array.shape
         )
+
 
         # -------------------------
         # Prediction
@@ -350,17 +403,21 @@ def predict_tumor(image_path):
             "Running model prediction..."
         )
 
+
         predictions = model(
             img_array,
             training=False
         )
 
+
         predictions = predictions.numpy()
+
 
         print(
             "Raw predictions:",
             predictions
         )
+
 
         # -------------------------
         # Predicted class
@@ -372,21 +429,25 @@ def predict_tumor(image_path):
             )
         )
 
+
         confidence = float(
             predictions[0][
                 predicted_index
             ]
         )
 
+
         print(
             "Predicted index:",
             predicted_index
         )
 
+
         print(
             "Confidence:",
             confidence
         )
+
 
         # -------------------------
         # Safety check
@@ -402,6 +463,7 @@ def predict_tumor(image_path):
                 0.0
             )
 
+
         # -------------------------
         # Get label
         # -------------------------
@@ -410,10 +472,12 @@ def predict_tumor(image_path):
             predicted_index
         ]
 
+
         print(
             "Predicted label:",
             label
         )
+
 
         # -------------------------
         # Display result
@@ -449,27 +513,38 @@ def predict_tumor(image_path):
                 f"Tumor: {label}"
             )
 
+
         print(
             "Final result:",
             result
         )
 
+
         print("--------------------------------")
+
 
         return (
             result,
             confidence
         )
 
+
     except Exception as e:
 
         print("--------------------------------")
-        print("PREDICTION ERROR")
-        print(str(e))
+
+        print(
+            "PREDICTION ERROR"
+        )
+
+        print(
+            str(e)
+        )
 
         traceback.print_exc()
 
         print("--------------------------------")
+
 
         return (
             f"Prediction error: {str(e)}",
@@ -495,9 +570,11 @@ def save_scan(
 
     cursor = connection.cursor()
 
+
     scan_date = datetime.now().strftime(
         "%d-%m-%Y %H:%M:%S"
     )
+
 
     cursor.execute(
         """
@@ -525,11 +602,14 @@ def save_scan(
         )
     )
 
+
     scan_id = cursor.lastrowid
+
 
     connection.commit()
 
     connection.close()
+
 
     return scan_id
 
@@ -544,6 +624,7 @@ def get_scan(scan_id):
 
     cursor = connection.cursor()
 
+
     cursor.execute(
         """
         SELECT *
@@ -553,9 +634,12 @@ def get_scan(scan_id):
         (scan_id,)
     )
 
+
     scan = cursor.fetchone()
 
+
     connection.close()
+
 
     return scan
 
@@ -570,9 +654,13 @@ def get_scans(search=""):
 
     cursor = connection.cursor()
 
+
     if search:
 
-        search_value = f"%{search}%"
+        search_value = (
+            f"%{search}%"
+        )
+
 
         cursor.execute(
             """
@@ -588,6 +676,7 @@ def get_scans(search=""):
             )
         )
 
+
     else:
 
         cursor.execute(
@@ -598,9 +687,12 @@ def get_scans(search=""):
             """
         )
 
+
     scans = cursor.fetchall()
 
+
     connection.close()
+
 
     return scans
 
@@ -615,15 +707,23 @@ def get_dashboard_statistics():
 
     cursor = connection.cursor()
 
+
+    # -------------------------
     # Total scans
+    # -------------------------
 
     cursor.execute(
         "SELECT COUNT(*) FROM scans"
     )
 
-    total_scans = cursor.fetchone()[0]
+    total_scans = (
+        cursor.fetchone()[0]
+    )
 
+
+    # -------------------------
     # Tumor cases
+    # -------------------------
 
     cursor.execute(
         """
@@ -633,9 +733,14 @@ def get_dashboard_statistics():
         """
     )
 
-    tumor_cases = cursor.fetchone()[0]
+    tumor_cases = (
+        cursor.fetchone()[0]
+    )
 
+
+    # -------------------------
     # No tumor cases
+    # -------------------------
 
     cursor.execute(
         """
@@ -645,9 +750,14 @@ def get_dashboard_statistics():
         """
     )
 
-    no_tumor_cases = cursor.fetchone()[0]
+    no_tumor_cases = (
+        cursor.fetchone()[0]
+    )
 
+
+    # -------------------------
     # Glioma
+    # -------------------------
 
     cursor.execute(
         """
@@ -657,9 +767,14 @@ def get_dashboard_statistics():
         """
     )
 
-    glioma_cases = cursor.fetchone()[0]
+    glioma_cases = (
+        cursor.fetchone()[0]
+    )
 
+
+    # -------------------------
     # Meningioma
+    # -------------------------
 
     cursor.execute(
         """
@@ -669,9 +784,14 @@ def get_dashboard_statistics():
         """
     )
 
-    meningioma_cases = cursor.fetchone()[0]
+    meningioma_cases = (
+        cursor.fetchone()[0]
+    )
 
+
+    # -------------------------
     # Pituitary
+    # -------------------------
 
     cursor.execute(
         """
@@ -681,30 +801,36 @@ def get_dashboard_statistics():
         """
     )
 
-    pituitary_cases = cursor.fetchone()[0]
+    pituitary_cases = (
+        cursor.fetchone()[0]
+    )
+
 
     connection.close()
 
-    model_accuracy = os.environ.get(
-        "MODEL_ACCURACY",
-        "96.9%"
-    )
 
     return {
 
-        "total_scans": total_scans,
+        "total_scans":
+            total_scans,
 
-        "tumor_cases": tumor_cases,
+        "tumor_cases":
+            tumor_cases,
 
-        "no_tumor_cases": no_tumor_cases,
+        "no_tumor_cases":
+            no_tumor_cases,
 
-        "glioma_cases": glioma_cases,
+        "glioma_cases":
+            glioma_cases,
 
-        "meningioma_cases": meningioma_cases,
+        "meningioma_cases":
+            meningioma_cases,
 
-        "pituitary_cases": pituitary_cases,
+        "pituitary_cases":
+            pituitary_cases,
 
-        "accuracy": model_accuracy
+        "accuracy":
+            MODEL_ACCURACY
     }
 
 
@@ -729,20 +855,24 @@ def index():
             ""
         ).strip()
 
+
         patient_id = request.form.get(
             "patient_id",
             ""
         ).strip()
+
 
         age = request.form.get(
             "age",
             ""
         ).strip()
 
+
         gender = request.form.get(
             "gender",
             ""
         ).strip()
+
 
         # -------------------------
         # Validation
@@ -758,6 +888,7 @@ def index():
                 url_for("index")
             )
 
+
         if not patient_id:
 
             flash(
@@ -767,6 +898,7 @@ def index():
             return redirect(
                 url_for("index")
             )
+
 
         if not age:
 
@@ -778,6 +910,7 @@ def index():
                 url_for("index")
             )
 
+
         if not gender:
 
             flash(
@@ -788,13 +921,16 @@ def index():
                 url_for("index")
             )
 
+
         try:
 
             age = int(age)
 
+
             if age < 1 or age > 120:
 
                 raise ValueError
+
 
         except ValueError:
 
@@ -806,8 +942,9 @@ def index():
                 url_for("index")
             )
 
+
         # -------------------------
-        # File
+        # File validation
         # -------------------------
 
         if "file" not in request.files:
@@ -820,7 +957,11 @@ def index():
                 url_for("index")
             )
 
-        file = request.files["file"]
+
+        file = request.files[
+            "file"
+        ]
+
 
         if file.filename == "":
 
@@ -831,6 +972,7 @@ def index():
             return redirect(
                 url_for("index")
             )
+
 
         if not allowed_file(
             file.filename
@@ -846,24 +988,34 @@ def index():
                 url_for("index")
             )
 
+
         # =========================
         # Save Image
         # =========================
 
-        original_filename = secure_filename(
-            file.filename
+        original_filename = (
+            secure_filename(
+                file.filename
+            )
         )
 
+
         filename = (
-            str(int(time.time() * 1000))
+            str(
+                int(
+                    time.time() * 1000
+                )
+            )
             + "_"
             + original_filename
         )
+
 
         file_location = os.path.join(
             app.config["UPLOAD_FOLDER"],
             filename
         )
+
 
         try:
 
@@ -871,10 +1023,12 @@ def index():
                 file_location
             )
 
+
             print(
                 "Uploaded image saved:",
                 file_location
             )
+
 
             print(
                 "Image exists:",
@@ -883,17 +1037,21 @@ def index():
                 )
             )
 
+
         except Exception as e:
 
             traceback.print_exc()
+
 
             flash(
                 f"Error saving image: {str(e)}"
             )
 
+
             return redirect(
                 url_for("index")
             )
+
 
         # =========================
         # Prediction
@@ -905,13 +1063,22 @@ def index():
             )
         )
 
+
         # =========================
         # Save SQLite Record
         # =========================
 
         # IMPORTANT:
-        # Save only the filename,
-        # NOT the full filesystem path.
+        # Store ONLY the filename.
+        #
+        # Correct:
+        # 1757654321000_mri.jpg
+        #
+        # Incorrect:
+        # /uploads/1757654321000_mri.jpg
+        #
+        # Incorrect:
+        # C:/project/uploads/1757654321000_mri.jpg
 
         scan_id = save_scan(
             patient_name,
@@ -923,12 +1090,14 @@ def index():
             confidence
         )
 
+
         return redirect(
             url_for(
                 "index",
                 scan_id=scan_id
             )
         )
+
 
     # =========================
     # GET
@@ -939,10 +1108,12 @@ def index():
         type=int
     )
 
+
     search = request.args.get(
         "search",
         ""
     ).strip()
+
 
     result = None
 
@@ -958,6 +1129,7 @@ def index():
 
     gender = None
 
+
     # =========================
     # Latest Scan
     # =========================
@@ -968,44 +1140,62 @@ def index():
             scan_id
         )
 
+
         if scan:
 
-            result = scan["result"]
+            result = scan[
+                "result"
+            ]
 
-            confidence = scan["confidence"]
 
-            patient_name = (
-                scan["patient_name"]
-            )
+            confidence = scan[
+                "confidence"
+            ]
 
-            patient_id = (
-                scan["patient_id"]
-            )
 
-            age = scan["age"]
+            patient_name = scan[
+                "patient_name"
+            ]
 
-            gender = scan["gender"]
 
-            # =================================
-            # IMPORTANT IMAGE FIX
-            # =================================
-            # Pass ONLY the filename.
+            patient_id = scan[
+                "patient_id"
+            ]
+
+
+            age = scan[
+                "age"
+            ]
+
+
+            gender = scan[
+                "gender"
+            ]
+
+
+            # IMPORTANT:
+            # Keep this as ONLY the
+            # filename.
             #
-            # Example:
-            # 1757654321000_mri.jpg
-            #
-            # index.html will convert it into:
-            # /uploads/1757654321000_mri.jpg
+            # The HTML handles:
+            # url_for(
+            #   'get_uploaded_file',
+            #   filename=file_path
+            # )
 
             file_path = scan[
                 "image_path"
             ]
 
+
     # =========================
     # Dashboard
     # =========================
 
-    stats = get_dashboard_statistics()
+    stats = (
+        get_dashboard_statistics()
+    )
+
 
     # =========================
     # Previous Scans
@@ -1015,7 +1205,9 @@ def index():
         search
     )
 
+
     return render_template(
+
         "index.html",
 
         result=result,
@@ -1065,6 +1257,7 @@ def index():
         accuracy=stats[
             "accuracy"
         ]
+
     )
 
 
@@ -1080,8 +1273,13 @@ def get_uploaded_file(
 ):
 
     return send_from_directory(
-        app.config["UPLOAD_FOLDER"],
+
+        app.config[
+            "UPLOAD_FOLDER"
+        ],
+
         filename
+
     )
 
 
@@ -1098,6 +1296,7 @@ def view_scan(scan_id):
         scan_id
     )
 
+
     if not scan:
 
         flash(
@@ -1107,6 +1306,7 @@ def view_scan(scan_id):
         return redirect(
             url_for("index")
         )
+
 
     return render_template(
         "scan.html",
@@ -1128,6 +1328,7 @@ def delete_scan(scan_id):
         scan_id
     )
 
+
     if not scan:
 
         flash(
@@ -1138,14 +1339,23 @@ def delete_scan(scan_id):
             url_for("index")
         )
 
+
     # -------------------------
     # Delete image
     # -------------------------
 
     image_path = os.path.join(
-        app.config["UPLOAD_FOLDER"],
-        scan["image_path"]
+
+        app.config[
+            "UPLOAD_FOLDER"
+        ],
+
+        scan[
+            "image_path"
+        ]
+
     )
+
 
     if os.path.exists(
         image_path
@@ -1161,29 +1371,42 @@ def delete_scan(scan_id):
 
             pass
 
+
     # -------------------------
     # Delete database record
     # -------------------------
 
-    connection = get_db_connection()
+    connection = (
+        get_db_connection()
+    )
 
-    cursor = connection.cursor()
+
+    cursor = (
+        connection.cursor()
+    )
+
 
     cursor.execute(
+
         """
         DELETE FROM scans
         WHERE id = ?
         """,
+
         (scan_id,)
+
     )
+
 
     connection.commit()
 
     connection.close()
 
+
     flash(
         "Scan deleted successfully."
     )
+
 
     return redirect(
         url_for("index")
@@ -1203,6 +1426,7 @@ def download_report(scan_id):
         scan_id
     )
 
+
     if not scan:
 
         flash(
@@ -1213,112 +1437,199 @@ def download_report(scan_id):
             url_for("index")
         )
 
-    safe_patient_name = secure_filename(
-        scan["patient_name"]
+
+    safe_patient_name = (
+        secure_filename(
+            scan["patient_name"]
+        )
     )
+
+
+    if not safe_patient_name:
+
+        safe_patient_name = "Patient"
+
 
     pdf_filename = (
-        f"Brain_Tumor_Report_"
-        f"{safe_patient_name}_"
-        f"{scan_id}.pdf"
+
+        "Brain_Tumor_Report_"
+
+        + safe_patient_name
+
+        + "_"
+
+        + str(scan_id)
+
+        + ".pdf"
+
     )
 
+
     pdf_path = os.path.join(
-        app.config["REPORT_FOLDER"],
+
+        app.config[
+            "REPORT_FOLDER"
+        ],
+
         pdf_filename
+
     )
+
 
     try:
 
         document = SimpleDocTemplate(
+
             pdf_path,
+
             pagesize=A4,
+
             rightMargin=40,
+
             leftMargin=40,
+
             topMargin=40,
+
             bottomMargin=40
+
         )
 
-        styles = getSampleStyleSheet()
+
+        styles = (
+            getSampleStyleSheet()
+        )
+
 
         title_style = ParagraphStyle(
+
             "TitleStyle",
+
             parent=styles["Title"],
+
             alignment=TA_CENTER,
+
             fontSize=20,
+
             spaceAfter=15
+
         )
+
 
         heading_style = ParagraphStyle(
+
             "HeadingStyle",
+
             parent=styles["Heading2"],
+
             fontSize=14,
+
             spaceBefore=10,
+
             spaceAfter=10
+
         )
+
 
         normal_style = ParagraphStyle(
+
             "NormalStyle",
+
             parent=styles["Normal"],
+
             fontSize=10,
+
             leading=15
+
         )
 
+
         story = []
+
 
         # -------------------------
         # Title
         # -------------------------
 
         story.append(
+
             Paragraph(
+
                 "BRAIN TUMOR DETECTION REPORT",
+
                 title_style
+
             )
+
         )
 
+
         story.append(
+
             Paragraph(
+
                 "AI-Based MRI Analysis System",
+
                 ParagraphStyle(
+
                     "Subtitle",
+
                     parent=normal_style,
+
                     alignment=TA_CENTER,
+
                     fontSize=11
+
                 )
+
             )
+
         )
+
 
         story.append(
             Spacer(1, 20)
         )
+
 
         # -------------------------
         # Report ID
         # -------------------------
 
         story.append(
+
             Paragraph(
+
                 f"<b>Report ID:</b> "
                 f"BT-{scan_id:05d}",
+
                 normal_style
+
             )
+
         )
+
 
         story.append(
             Spacer(1, 10)
         )
+
 
         # -------------------------
         # Patient Details
         # -------------------------
 
         story.append(
+
             Paragraph(
+
                 "Patient Details",
+
                 heading_style
+
             )
+
         )
+
 
         patient_data = [
 
@@ -1349,15 +1660,21 @@ def download_report(scan_id):
 
         ]
 
+
         patient_table = Table(
+
             patient_data,
+
             colWidths=[
                 150,
                 330
             ]
+
         )
 
+
         patient_table.setStyle(
+
             TableStyle([
 
                 (
@@ -1404,31 +1721,46 @@ def download_report(scan_id):
                 )
 
             ])
+
         )
+
 
         story.append(
             patient_table
         )
 
+
         story.append(
             Spacer(1, 20)
         )
+
 
         # -------------------------
         # MRI Image
         # -------------------------
 
         story.append(
+
             Paragraph(
                 "MRI Image",
                 heading_style
             )
+
         )
 
+
         image_path = os.path.join(
-            app.config["UPLOAD_FOLDER"],
-            scan["image_path"]
+
+            app.config[
+                "UPLOAD_FOLDER"
+            ],
+
+            scan[
+                "image_path"
+            ]
+
         )
+
 
         if os.path.exists(
             image_path
@@ -1444,36 +1776,59 @@ def download_report(scan_id):
                         pil_image.size
                     )
 
-                max_width = 4.5 * inch
 
-                max_height = 4.5 * inch
+                if width > 0 and height > 0:
 
-                scale = min(
-                    max_width / width,
-                    max_height / height
-                )
+                    max_width = (
+                        4.5 * inch
+                    )
 
-                report_width = (
-                    width * scale
-                )
+                    max_height = (
+                        4.5 * inch
+                    )
 
-                report_height = (
-                    height * scale
-                )
 
-                mri_image = ReportLabImage(
-                    image_path,
-                    width=report_width,
-                    height=report_height
-                )
+                    scale = min(
 
-                story.append(
-                    mri_image
-                )
+                        max_width / width,
 
-                story.append(
-                    Spacer(1, 15)
-                )
+                        max_height / height
+
+                    )
+
+
+                    report_width = (
+                        width * scale
+                    )
+
+
+                    report_height = (
+                        height * scale
+                    )
+
+
+                    mri_image = (
+                        ReportLabImage(
+
+                            image_path,
+
+                            width=report_width,
+
+                            height=report_height
+
+                        )
+                    )
+
+
+                    story.append(
+                        mri_image
+                    )
+
+
+                    story.append(
+                        Spacer(1, 15)
+                    )
+
 
             except Exception as e:
 
@@ -1482,16 +1837,23 @@ def download_report(scan_id):
                     e
                 )
 
+
         # -------------------------
         # Prediction
         # -------------------------
 
         story.append(
+
             Paragraph(
+
                 "Prediction Result",
+
                 heading_style
+
             )
+
         )
+
 
         prediction_data = [
 
@@ -1507,15 +1869,21 @@ def download_report(scan_id):
 
         ]
 
+
         prediction_table = Table(
+
             prediction_data,
+
             colWidths=[
                 150,
                 330
             ]
+
         )
 
+
         prediction_table.setStyle(
+
             TableStyle([
 
                 (
@@ -1555,26 +1923,36 @@ def download_report(scan_id):
                 )
 
             ])
+
         )
+
 
         story.append(
             prediction_table
         )
 
+
         story.append(
             Spacer(1, 25)
         )
+
 
         # -------------------------
         # System Information
         # -------------------------
 
         story.append(
+
             Paragraph(
+
                 "System Information",
+
                 heading_style
+
             )
+
         )
+
 
         system_data = [
 
@@ -1589,6 +1967,11 @@ def download_report(scan_id):
             ],
 
             [
+                "Model Accuracy",
+                "96.9%"
+            ],
+
+            [
                 "Classes",
                 "Pituitary, Glioma, "
                 "No Tumor, Meningioma"
@@ -1596,15 +1979,21 @@ def download_report(scan_id):
 
         ]
 
+
         system_table = Table(
+
             system_data,
+
             colWidths=[
                 150,
                 330
             ]
+
         )
 
+
         system_table.setStyle(
+
             TableStyle([
 
                 (
@@ -1644,51 +2033,73 @@ def download_report(scan_id):
                 )
 
             ])
+
         )
+
 
         story.append(
             system_table
         )
 
+
         story.append(
             Spacer(1, 25)
         )
+
 
         # -------------------------
         # Disclaimer
         # -------------------------
 
         story.append(
+
             Paragraph(
+
                 "<b>Disclaimer:</b> This report is "
                 "generated by an AI-based image "
                 "classification system and is intended "
                 "for educational and research purposes. "
                 "It should not be used as a substitute "
                 "for professional medical diagnosis.",
+
                 normal_style
+
             )
+
         )
+
 
         story.append(
             Spacer(1, 15)
         )
 
+
         story.append(
+
             Paragraph(
+
                 "Brain Tumor Detection System - "
                 "Team IT 43, Parul University",
+
                 ParagraphStyle(
+
                     "Footer",
+
                     parent=normal_style,
+
                     alignment=TA_CENTER
+
                 )
+
             )
+
         )
+
 
         document.build(
             story
         )
+
 
     except Exception as e:
 
@@ -1698,19 +2109,27 @@ def download_report(scan_id):
 
         traceback.print_exc()
 
+
         flash(
             f"Could not generate PDF: {str(e)}"
         )
+
 
         return redirect(
             url_for("index")
         )
 
+
     return send_file(
+
         pdf_path,
+
         as_attachment=True,
+
         download_name=pdf_filename,
+
         mimetype="application/pdf"
+
     )
 
 
@@ -1725,19 +2144,22 @@ def health():
 
     return {
 
-        "status": "ok",
+        "status":
+            "ok",
 
-        "model_loaded": (
-            model is not None
-        ),
+        "model_loaded":
+            model is not None,
 
-        "model_input_shape": str(
-            model.input_shape
-        ),
+        "model_input_shape":
+            str(model.input_shape),
 
-        "database": os.path.exists(
-            DATABASE_PATH
-        )
+        "model_accuracy":
+            "96.9%",
+
+        "database":
+            os.path.exists(
+                DATABASE_PATH
+            )
 
     }
 
@@ -1749,14 +2171,21 @@ def health():
 if __name__ == "__main__":
 
     port = int(
+
         os.environ.get(
             "PORT",
             5000
         )
+
     )
 
+
     app.run(
+
         host="0.0.0.0",
+
         port=port,
+
         debug=False
+
     )
