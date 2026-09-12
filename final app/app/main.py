@@ -127,11 +127,14 @@ MODEL_PATH = os.path.join(
 )
 
 if not os.path.exists(MODEL_PATH):
+
     raise FileNotFoundError(
         f"Model file not found: {MODEL_PATH}"
     )
 
+
 print("Loading model...")
+
 
 try:
 
@@ -140,7 +143,9 @@ try:
         compile=False
     )
 
-    print("Model loaded successfully.")
+    print(
+        "Model loaded successfully."
+    )
 
     print(
         "Model expects input shape:",
@@ -151,6 +156,7 @@ except Exception as e:
 
     print("MODEL LOADING ERROR")
     print(str(e))
+
     traceback.print_exc()
 
     raise
@@ -221,6 +227,7 @@ def init_database():
     )
 
     connection.commit()
+
     connection.close()
 
     print(
@@ -238,6 +245,7 @@ init_database()
 def allowed_file(filename):
 
     if not filename:
+
         return False
 
     return (
@@ -520,6 +528,7 @@ def save_scan(
     scan_id = cursor.lastrowid
 
     connection.commit()
+
     connection.close()
 
     return scan_id
@@ -682,12 +691,19 @@ def get_dashboard_statistics():
     )
 
     return {
+
         "total_scans": total_scans,
+
         "tumor_cases": tumor_cases,
+
         "no_tumor_cases": no_tumor_cases,
+
         "glioma_cases": glioma_cases,
+
         "meningioma_cases": meningioma_cases,
+
         "pituitary_cases": pituitary_cases,
+
         "accuracy": model_accuracy
     }
 
@@ -733,33 +749,41 @@ def index():
         # -------------------------
 
         if not patient_name:
+
             flash(
                 "Please enter patient name."
             )
+
             return redirect(
                 url_for("index")
             )
 
         if not patient_id:
+
             flash(
                 "Please enter patient ID."
             )
+
             return redirect(
                 url_for("index")
             )
 
         if not age:
+
             flash(
                 "Please enter patient age."
             )
+
             return redirect(
                 url_for("index")
             )
 
         if not gender:
+
             flash(
                 "Please select gender."
             )
+
             return redirect(
                 url_for("index")
             )
@@ -769,6 +793,7 @@ def index():
             age = int(age)
 
             if age < 1 or age > 120:
+
                 raise ValueError
 
         except ValueError:
@@ -825,14 +850,14 @@ def index():
         # Save Image
         # =========================
 
-        filename = secure_filename(
+        original_filename = secure_filename(
             file.filename
         )
 
         filename = (
             str(int(time.time() * 1000))
             + "_"
-            + filename
+            + original_filename
         )
 
         file_location = os.path.join(
@@ -844,6 +869,18 @@ def index():
 
             file.save(
                 file_location
+            )
+
+            print(
+                "Uploaded image saved:",
+                file_location
+            )
+
+            print(
+                "Image exists:",
+                os.path.exists(
+                    file_location
+                )
             )
 
         except Exception as e:
@@ -871,6 +908,10 @@ def index():
         # =========================
         # Save SQLite Record
         # =========================
+
+        # IMPORTANT:
+        # Save only the filename,
+        # NOT the full filesystem path.
 
         scan_id = save_scan(
             patient_name,
@@ -904,12 +945,17 @@ def index():
     ).strip()
 
     result = None
+
     confidence = None
+
     file_path = None
 
     patient_name = None
+
     patient_id = None
+
     age = None
+
     gender = None
 
     # =========================
@@ -918,15 +964,15 @@ def index():
 
     if scan_id:
 
-        scan = get_scan(scan_id)
+        scan = get_scan(
+            scan_id
+        )
 
         if scan:
 
             result = scan["result"]
 
-            confidence = (
-                scan["confidence"]
-            )
+            confidence = scan["confidence"]
 
             patient_name = (
                 scan["patient_name"]
@@ -940,10 +986,20 @@ def index():
 
             gender = scan["gender"]
 
-            file_path = url_for(
-                "get_uploaded_file",
-                filename=scan["image_path"]
-            )
+            # =================================
+            # IMPORTANT IMAGE FIX
+            # =================================
+            # Pass ONLY the filename.
+            #
+            # Example:
+            # 1757654321000_mri.jpg
+            #
+            # index.html will convert it into:
+            # /uploads/1757654321000_mri.jpg
+
+            file_path = scan[
+                "image_path"
+            ]
 
     # =========================
     # Dashboard
@@ -955,7 +1011,9 @@ def index():
     # Previous Scans
     # =========================
 
-    scans = get_scans(search)
+    scans = get_scans(
+        search
+    )
 
     return render_template(
         "index.html",
@@ -1036,7 +1094,9 @@ def get_uploaded_file(
 )
 def view_scan(scan_id):
 
-    scan = get_scan(scan_id)
+    scan = get_scan(
+        scan_id
+    )
 
     if not scan:
 
@@ -1064,7 +1124,9 @@ def view_scan(scan_id):
 )
 def delete_scan(scan_id):
 
-    scan = get_scan(scan_id)
+    scan = get_scan(
+        scan_id
+    )
 
     if not scan:
 
@@ -1085,11 +1147,18 @@ def delete_scan(scan_id):
         scan["image_path"]
     )
 
-    if os.path.exists(image_path):
+    if os.path.exists(
+        image_path
+    ):
 
         try:
-            os.remove(image_path)
+
+            os.remove(
+                image_path
+            )
+
         except Exception:
+
             pass
 
     # -------------------------
@@ -1109,6 +1178,7 @@ def delete_scan(scan_id):
     )
 
     connection.commit()
+
     connection.close()
 
     flash(
@@ -1129,7 +1199,9 @@ def delete_scan(scan_id):
 )
 def download_report(scan_id):
 
-    scan = get_scan(scan_id)
+    scan = get_scan(
+        scan_id
+    )
 
     if not scan:
 
@@ -1227,7 +1299,8 @@ def download_report(scan_id):
 
         story.append(
             Paragraph(
-                f"<b>Report ID:</b> BT-{scan_id:05d}",
+                f"<b>Report ID:</b> "
+                f"BT-{scan_id:05d}",
                 normal_style
             )
         )
@@ -1357,7 +1430,9 @@ def download_report(scan_id):
             scan["image_path"]
         )
 
-        if os.path.exists(image_path):
+        if os.path.exists(
+            image_path
+        ):
 
             try:
 
@@ -1370,6 +1445,7 @@ def download_report(scan_id):
                     )
 
                 max_width = 4.5 * inch
+
                 max_height = 4.5 * inch
 
                 scale = min(
@@ -1642,7 +1718,9 @@ def download_report(scan_id):
 # Health Check
 # =========================
 
-@app.route("/health")
+@app.route(
+    "/health"
+)
 def health():
 
     return {
