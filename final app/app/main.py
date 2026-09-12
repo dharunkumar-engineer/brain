@@ -11,13 +11,15 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 import absl.logging
 absl.logging.set_verbosity(absl.logging.ERROR)
 
-import sqlite3
 import traceback
 import time
 from datetime import datetime
 
 import tensorflow as tf
 import numpy as np
+import psycopg2
+
+from psycopg2.extras import RealDictCursor
 
 from flask import (
     Flask,
@@ -98,11 +100,27 @@ REPORT_FOLDER = os.path.join(
 )
 
 
-DATABASE_PATH = os.path.join(
-    BASE_DIR,
-    "brain_tumor.db"
+# =========================
+# PostgreSQL Configuration
+# =========================
+
+DATABASE_URL = os.environ.get(
+    "DATABASE_URL"
 )
 
+
+if not DATABASE_URL:
+
+    raise RuntimeError(
+        "DATABASE_URL environment variable is not set. "
+        "Please add your PostgreSQL Internal Database URL "
+        "in Render Environment Variables."
+    )
+
+
+# =========================
+# Create Required Folders
+# =========================
 
 os.makedirs(
     UPLOAD_FOLDER,
@@ -210,59 +228,85 @@ MODEL_ACCURACY = "96.9"
 
 
 # =========================
-# Database
+# PostgreSQL Database
 # =========================
 
 def get_db_connection():
 
-    connection = sqlite3.connect(
-        DATABASE_PATH
+    connection = psycopg2.connect(
+        DATABASE_URL
     )
-
-    connection.row_factory = sqlite3.Row
 
     return connection
 
 
+# =========================
+# Initialize Database
+# =========================
+
 def init_database():
 
-    connection = get_db_connection()
+    connection = None
 
-    cursor = connection.cursor()
+    try:
 
-    cursor.execute(
-        """
-        CREATE TABLE IF NOT EXISTS scans (
+        connection = get_db_connection()
 
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+        cursor = connection.cursor()
 
-            patient_name TEXT NOT NULL,
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS scans (
 
-            patient_id TEXT NOT NULL,
+                id SERIAL PRIMARY KEY,
 
-            age INTEGER NOT NULL,
+                patient_name TEXT NOT NULL,
 
-            gender TEXT NOT NULL,
+                patient_id TEXT NOT NULL,
 
-            image_path TEXT NOT NULL,
+                age INTEGER NOT NULL,
 
-            result TEXT NOT NULL,
+                gender TEXT NOT NULL,
 
-            confidence TEXT NOT NULL,
+                image_path TEXT NOT NULL,
 
-            date TEXT NOT NULL
+                result TEXT NOT NULL,
 
+                confidence TEXT NOT NULL,
+
+                date TEXT NOT NULL
+
+            )
+            """
         )
-        """
-    )
 
-    connection.commit()
+        connection.commit()
 
-    connection.close()
+        cursor.close()
 
-    print(
-        "SQLite database initialized."
-    )
+        print(
+            "PostgreSQL database initialized successfully."
+        )
+
+    except Exception as e:
+
+        print(
+            "DATABASE INITIALIZATION ERROR"
+        )
+
+        print(
+            str(e)
+        )
+
+        traceback.print_exc()
+
+        raise
+
+    finally:
+
+        if connection:
+
+            connection.close()
 
 
 init_database()
@@ -566,52 +610,80 @@ def save_scan(
     confidence
 ):
 
-    connection = get_db_connection()
+    connection = None
 
-    cursor = connection.cursor()
+    try:
+
+        connection = get_db_connection()
+
+        cursor = connection.cursor()
 
 
-    scan_date = datetime.now().strftime(
-        "%d-%m-%Y %H:%M:%S"
-    )
-
-
-    cursor.execute(
-        """
-        INSERT INTO scans (
-            patient_name,
-            patient_id,
-            age,
-            gender,
-            image_path,
-            result,
-            confidence,
-            date
+        scan_date = datetime.now().strftime(
+            "%d-%m-%Y %H:%M:%S"
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """,
-        (
-            patient_name,
-            patient_id,
-            age,
-            gender,
-            image_path,
-            result,
-            f"{confidence * 100:.2f}%",
-            scan_date
+
+
+        cursor.execute(
+            """
+            INSERT INTO scans (
+                patient_name,
+                patient_id,
+                age,
+                gender,
+                image_path,
+                result,
+                confidence,
+                date
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            RETURNING id
+            """,
+            (
+                patient_name,
+                patient_id,
+                age,
+                gender,
+                image_path,
+                result,
+                f"{confidence * 100:.2f}%",
+                scan_date
+            )
         )
-    )
 
 
-    scan_id = cursor.lastrowid
+        scan_id = cursor.fetchone()[0]
 
 
-    connection.commit()
+        connection.commit()
 
-    connection.close()
+        cursor.close()
 
 
-    return scan_id
+        return scan_id
+
+
+    except Exception as e:
+
+        if connection:
+
+            connection.rollback()
+
+        print(
+            "SAVE SCAN ERROR:",
+            str(e)
+        )
+
+        traceback.print_exc()
+
+        raise
+
+
+    finally:
+
+        if connection:
+
+            connection.close()
 
 
 # =========================
@@ -620,28 +692,41 @@ def save_scan(
 
 def get_scan(scan_id):
 
-    connection = get_db_connection()
+    connection = None
 
-    cursor = connection.cursor()
+    try:
 
+        connection = get_db_connection()
 
-    cursor.execute(
-        """
-        SELECT *
-        FROM scans
-        WHERE id = ?
-        """,
-        (scan_id,)
-    )
+        cursor = connection.cursor(
+            cursor_factory=RealDictCursor
+        )
 
 
-    scan = cursor.fetchone()
+        cursor.execute(
+            """
+            SELECT *
+            FROM scans
+            WHERE id = %s
+            """,
+            (scan_id,)
+        )
 
 
-    connection.close()
+        scan = cursor.fetchone()
 
 
-    return scan
+        cursor.close()
+
+
+        return scan
+
+
+    finally:
+
+        if connection:
+
+            connection.close()
 
 
 # =========================
@@ -650,51 +735,64 @@ def get_scan(scan_id):
 
 def get_scans(search=""):
 
-    connection = get_db_connection()
+    connection = None
 
-    cursor = connection.cursor()
+    try:
 
+        connection = get_db_connection()
 
-    if search:
-
-        search_value = (
-            f"%{search}%"
+        cursor = connection.cursor(
+            cursor_factory=RealDictCursor
         )
 
 
-        cursor.execute(
-            """
-            SELECT *
-            FROM scans
-            WHERE patient_name LIKE ?
-               OR patient_id LIKE ?
-            ORDER BY id DESC
-            """,
-            (
-                search_value,
-                search_value
+        if search:
+
+            search_value = (
+                f"%{search}%"
             )
-        )
 
 
-    else:
-
-        cursor.execute(
-            """
-            SELECT *
-            FROM scans
-            ORDER BY id DESC
-            """
-        )
-
-
-    scans = cursor.fetchall()
-
-
-    connection.close()
+            cursor.execute(
+                """
+                SELECT *
+                FROM scans
+                WHERE patient_name ILIKE %s
+                   OR patient_id ILIKE %s
+                ORDER BY id DESC
+                """,
+                (
+                    search_value,
+                    search_value
+                )
+            )
 
 
-    return scans
+        else:
+
+            cursor.execute(
+                """
+                SELECT *
+                FROM scans
+                ORDER BY id DESC
+                """
+            )
+
+
+        scans = cursor.fetchall()
+
+
+        cursor.close()
+
+
+        return scans
+
+
+    finally:
+
+        if connection:
+
+            connection.close()
 
 
 # =========================
@@ -703,135 +801,147 @@ def get_scans(search=""):
 
 def get_dashboard_statistics():
 
-    connection = get_db_connection()
+    connection = None
 
-    cursor = connection.cursor()
+    try:
 
+        connection = get_db_connection()
 
-    # -------------------------
-    # Total scans
-    # -------------------------
-
-    cursor.execute(
-        "SELECT COUNT(*) FROM scans"
-    )
-
-    total_scans = (
-        cursor.fetchone()[0]
-    )
+        cursor = connection.cursor()
 
 
-    # -------------------------
-    # Tumor cases
-    # -------------------------
+        # -------------------------
+        # Total scans
+        # -------------------------
 
-    cursor.execute(
-        """
-        SELECT COUNT(*)
-        FROM scans
-        WHERE result LIKE 'Tumor:%'
-        """
-    )
+        cursor.execute(
+            "SELECT COUNT(*) FROM scans"
+        )
 
-    tumor_cases = (
-        cursor.fetchone()[0]
-    )
+        total_scans = (
+            cursor.fetchone()[0]
+        )
 
 
-    # -------------------------
-    # No tumor cases
-    # -------------------------
+        # -------------------------
+        # Tumor cases
+        # -------------------------
 
-    cursor.execute(
-        """
-        SELECT COUNT(*)
-        FROM scans
-        WHERE result = 'No Tumor Detected'
-        """
-    )
+        cursor.execute(
+            """
+            SELECT COUNT(*)
+            FROM scans
+            WHERE result LIKE 'Tumor:%'
+            """
+        )
 
-    no_tumor_cases = (
-        cursor.fetchone()[0]
-    )
-
-
-    # -------------------------
-    # Glioma
-    # -------------------------
-
-    cursor.execute(
-        """
-        SELECT COUNT(*)
-        FROM scans
-        WHERE result = 'Tumor: Glioma'
-        """
-    )
-
-    glioma_cases = (
-        cursor.fetchone()[0]
-    )
+        tumor_cases = (
+            cursor.fetchone()[0]
+        )
 
 
-    # -------------------------
-    # Meningioma
-    # -------------------------
+        # -------------------------
+        # No tumor cases
+        # -------------------------
 
-    cursor.execute(
-        """
-        SELECT COUNT(*)
-        FROM scans
-        WHERE result = 'Tumor: Meningioma'
-        """
-    )
+        cursor.execute(
+            """
+            SELECT COUNT(*)
+            FROM scans
+            WHERE result = 'No Tumor Detected'
+            """
+        )
 
-    meningioma_cases = (
-        cursor.fetchone()[0]
-    )
-
-
-    # -------------------------
-    # Pituitary
-    # -------------------------
-
-    cursor.execute(
-        """
-        SELECT COUNT(*)
-        FROM scans
-        WHERE result = 'Tumor: Pituitary'
-        """
-    )
-
-    pituitary_cases = (
-        cursor.fetchone()[0]
-    )
+        no_tumor_cases = (
+            cursor.fetchone()[0]
+        )
 
 
-    connection.close()
+        # -------------------------
+        # Glioma
+        # -------------------------
+
+        cursor.execute(
+            """
+            SELECT COUNT(*)
+            FROM scans
+            WHERE result = 'Tumor: Glioma'
+            """
+        )
+
+        glioma_cases = (
+            cursor.fetchone()[0]
+        )
 
 
-    return {
+        # -------------------------
+        # Meningioma
+        # -------------------------
 
-        "total_scans":
-            total_scans,
+        cursor.execute(
+            """
+            SELECT COUNT(*)
+            FROM scans
+            WHERE result = 'Tumor: Meningioma'
+            """
+        )
 
-        "tumor_cases":
-            tumor_cases,
+        meningioma_cases = (
+            cursor.fetchone()[0]
+        )
 
-        "no_tumor_cases":
-            no_tumor_cases,
 
-        "glioma_cases":
-            glioma_cases,
+        # -------------------------
+        # Pituitary
+        # -------------------------
 
-        "meningioma_cases":
-            meningioma_cases,
+        cursor.execute(
+            """
+            SELECT COUNT(*)
+            FROM scans
+            WHERE result = 'Tumor: Pituitary'
+            """
+        )
 
-        "pituitary_cases":
-            pituitary_cases,
+        pituitary_cases = (
+            cursor.fetchone()[0]
+        )
 
-        "accuracy":
-            MODEL_ACCURACY
-    }
+
+        cursor.close()
+
+
+        return {
+
+            "total_scans":
+                total_scans,
+
+            "tumor_cases":
+                tumor_cases,
+
+            "no_tumor_cases":
+                no_tumor_cases,
+
+            "glioma_cases":
+                glioma_cases,
+
+            "meningioma_cases":
+                meningioma_cases,
+
+            "pituitary_cases":
+                pituitary_cases,
+
+            "accuracy":
+                MODEL_ACCURACY
+
+        }
+
+
+    finally:
+
+        if connection:
+
+            connection.close()
 
 
 # =========================
@@ -1065,19 +1175,18 @@ def index():
 
 
         # =========================
-        # Save SQLite Record
+        # Save PostgreSQL Record
         # =========================
 
-        # IMPORTANT:
         # Store ONLY the filename.
         #
-        # Correct:
+        # Example:
         # 1757654321000_mri.jpg
         #
-        # Incorrect:
+        # Do NOT store:
         # /uploads/1757654321000_mri.jpg
         #
-        # Incorrect:
+        # Do NOT store:
         # C:/project/uploads/1757654321000_mri.jpg
 
         scan_id = save_scan(
@@ -1173,15 +1282,7 @@ def index():
             ]
 
 
-            # IMPORTANT:
-            # Keep this as ONLY the
-            # filename.
-            #
-            # The HTML handles:
-            # url_for(
-            #   'get_uploaded_file',
-            #   filename=file_path
-            # )
+            # Store filename only.
 
             file_path = scan[
                 "image_path"
@@ -1376,31 +1477,56 @@ def delete_scan(scan_id):
     # Delete database record
     # -------------------------
 
-    connection = (
-        get_db_connection()
-    )
+    connection = None
+
+    try:
+
+        connection = get_db_connection()
+
+        cursor = connection.cursor()
 
 
-    cursor = (
-        connection.cursor()
-    )
+        cursor.execute(
+            """
+            DELETE FROM scans
+            WHERE id = %s
+            """,
+            (scan_id,)
+        )
 
 
-    cursor.execute(
+        connection.commit()
 
-        """
-        DELETE FROM scans
-        WHERE id = ?
-        """,
-
-        (scan_id,)
-
-    )
+        cursor.close()
 
 
-    connection.commit()
+    except Exception as e:
 
-    connection.close()
+        if connection:
+
+            connection.rollback()
+
+        print(
+            "DELETE SCAN ERROR:",
+            str(e)
+        )
+
+        traceback.print_exc()
+
+        flash(
+            f"Could not delete scan: {str(e)}"
+        )
+
+        return redirect(
+            url_for("index")
+        )
+
+
+    finally:
+
+        if connection:
+
+            connection.close()
 
 
     flash(
@@ -2142,7 +2268,42 @@ def download_report(scan_id):
 )
 def health():
 
-    return {
+    database_status = False
+
+    database_error = None
+
+    connection = None
+
+    try:
+
+        connection = get_db_connection()
+
+        cursor = connection.cursor()
+
+        cursor.execute(
+            "SELECT 1"
+        )
+
+        cursor.fetchone()
+
+        cursor.close()
+
+        database_status = True
+
+
+    except Exception as e:
+
+        database_error = str(e)
+
+
+    finally:
+
+        if connection:
+
+            connection.close()
+
+
+    response = {
 
         "status":
             "ok",
@@ -2157,11 +2318,19 @@ def health():
             "96.9%",
 
         "database":
-            os.path.exists(
-                DATABASE_PATH
-            )
+            database_status
 
     }
+
+
+    if database_error:
+
+        response[
+            "database_error"
+        ] = database_error
+
+
+    return response
 
 
 # =========================
