@@ -1,25 +1,82 @@
-TEAM-43 
-🧠 Brain Tumor Detection using Deep Learning (VGG16 + Flask)
+🧠 TEAM-43 — Brain Tumor Detection Using Deep Learning
 
-This project is a web-based Brain Tumor Detection System that uses a pre-trained VGG16 deep learning model to classify MRI brain images.
-The application allows users to upload an MRI scan and instantly view whether a tumor is present—making it helpful for academic, research, and demonstration purposes.
+A web-based Brain Tumor Detection System developed using VGG16 Deep Learning and Flask. The system analyzes brain MRI images and classifies them into different tumor categories or identifies the absence of a tumor.
 
-📌 Features
+«Note: This project is intended for academic, research, and demonstration purposes only. It is not a medical diagnostic tool.»
 
-✔ Upload MRI images (JPG, PNG)
-✔ Pre-processing: resizing, normalization
-✔ VGG16-based deep learning prediction
-✔ Displays:
+---
 
-Tumor / No Tumor
+📌 Project Overview
 
-Type of tumor (Glioma / Meningioma / Pituitary / No Tumor)
+The Brain Tumor Detection System allows users to upload an MRI brain image through a simple web interface. The uploaded image is pre-processed and passed through a trained VGG16-based deep learning model to predict the tumor category.
 
-Confidence percentage
-✔ Simple and user-friendly Flask interface
+The system provides:
 
+- 🧠 Tumor / No Tumor classification
+- 🔬 Tumor type identification
+- 📊 Prediction confidence percentage
+- 🖼️ MRI image preview
+- 🌐 Flask-based web interface
+- 📁 Scan history and patient information
+- 📄 Prediction report generation
 
-🛠 Project Structure
+---
+
+✨ Features
+
+- Upload MRI images in JPG/PNG format
+- Automatic image preprocessing
+- Image resizing to 128 × 128 pixels
+- Pixel normalization
+- VGG16-based deep learning prediction
+- Classification of four categories:
+  - Glioma
+  - Meningioma
+  - Pituitary
+  - No Tumor
+- Displays prediction confidence
+- User-friendly web interface
+- PostgreSQL database integration
+- Scan history management
+- Health-check endpoint for deployment monitoring
+
+---
+
+🛠️ Technologies Used
+
+Frontend
+
+- HTML5
+- CSS3
+- Bootstrap
+- JavaScript
+
+Backend
+
+- Python
+- Flask
+
+Machine Learning
+
+- TensorFlow
+- Keras
+- VGG16
+- NumPy
+- Pillow
+
+Database
+
+- PostgreSQL
+
+Deployment
+
+- Render
+- Gunicorn
+
+---
+
+📂 Project Structure
+
 Brain-Tumor-Detection/
 │
 ├── models/
@@ -30,71 +87,193 @@ Brain-Tumor-Detection/
 │
 ├── uploads/
 │
-├── app.py
+├── main.py
 ├── requirements.txt
 └── README.md
 
+---
+
 ⚙️ Requirements
 
-Install Python (version 3.8+ recommended)
+Make sure Python 3.8 or later is installed.
 
-Required libraries (install via requirements.txt):
+Install the required dependencies using:
+
+pip install -r requirements.txt
+
+Example "requirements.txt":
 
 Flask
 tensorflow
 keras
 numpy
-pillow
+Pillow
 opencv-python
-werkzeug
+Werkzeug
+psycopg2-binary
+gunicorn
+reportlab
 
+---
 
-To install all dependencies:
+▶️ How to Run Locally
+
+1. Clone the Repository
+
+git clone <YOUR-GITHUB-REPOSITORY-URL>
+
+Navigate into the project folder:
+
+cd Brain-Tumor-Detection
+
+2. Install Dependencies
+
 pip install -r requirements.txt
 
-▶️ How to Run the Project (Step-by-Step)
-1️⃣ Download the project files
+3. Configure the Database
 
-Place app.py, model.h5, and the templates/ folder together.
-Ensure the folder structure matches what is shown above.
+Set the PostgreSQL connection string as an environment variable:
 
-2️⃣ Install Dependencies
+DATABASE_URL=your_postgresql_database_url
 
-Open a terminal or command prompt inside the project folder:
-pip install -r requirements.txt
-If you don’t have a requirements file, run:
-pip install flask tensorflow keras pillow numpy opencv-python werkzeug
+For local development, make sure PostgreSQL is running and the database credentials are configured correctly.
 
-3️⃣ Run the Flask Application
+4. Start the Flask Application
 
-Run the following command:
-python app.py
-You should see:
-Running on http://127.0.0.1:5000/
+python main.py
 
-4️⃣ Open the Web App
+The application will start at:
 
-Open your browser and go to:
 http://127.0.0.1:5000/
 
-5️⃣ Upload an MRI Image
-Upload a brain MRI scan
-Click Predict
-View results instantly (Tumor type + confidence score)
+5. Open the Web Application
+
+Open your browser and visit:
+
+http://127.0.0.1:5000/
+
+6. Upload an MRI Image
+
+1. Enter the patient details.
+2. Upload an MRI image.
+3. Click Detect Tumor.
+4. The system processes the image.
+5. View the predicted tumor category and confidence score.
+
+---
 
 🧪 Model Details
 
-Architecture: VGG16 (pretrained on ImageNet)
-Layers Fine-Tuned: last 2–3 convolution layers
-Image Size: 128 × 128
-Output Classes:
+Parameter| Details
+Architecture| VGG16
+Transfer Learning| Yes
+Pretrained Dataset| ImageNet
+Input Image Size| 128 × 128
+Number of Classes| 4
+Framework| TensorFlow / Keras
+Output| Class + Confidence
+
+Classification Classes
+
+The model classifies MRI images into:
+
 Glioma
 Meningioma
 Pituitary
 No Tumor
 
+---
+
+📊 Model Performance
+
+The trained model achieved the following evaluation results:
+
+Metric| Score
+Accuracy| 96.9%
+Precision| 97.2%
+Recall| 96.5%
+F1-Score| 96.8%
+ROC-AUC| 0.98
+
+---
+
+🔄 System Workflow
+
+User
+  ↓
+Upload MRI Image
+  ↓
+Image Preprocessing
+  ↓
+Resize to 128 × 128
+  ↓
+Normalization
+  ↓
+VGG16 Deep Learning Model
+  ↓
+Prediction
+  ↓
+Tumor Classification
+  ↓
+Confidence Score
+  ↓
+Display Result
+
+---
+
+🗄️ Database
+
+The application uses PostgreSQL to store scan information.
+
+The database stores details such as:
+
+ID
+Patient Name
+Patient ID
+Age
+Gender
+Image Path
+Prediction Result
+Confidence
+Date
+
+---
+
+🚀 Deployment
+
+The application can be deployed using Render.
+
+Build Command
+
+pip install -r requirements.txt
+
+Start Command
+
+gunicorn main:app
+
+Set the following environment variable in the Render Web Service:
+
+DATABASE_URL
+
+The value should be the PostgreSQL Internal Database URL provided by Render.
+
+---
+
+🩺 Disclaimer
+
+This system is developed for academic, educational, research, and demonstration purposes.
+
+The predictions generated by the model should not be considered a medical diagnosis. MRI interpretation and diagnosis must be performed by qualified medical professionals using appropriate clinical evaluation and diagnostic procedures.
+
+---
+
 👨‍💻 Author
 
-Prepared by DHARUNKUMAR C
+Dharunkumar C
+
 Department of Information Technology
-College PIET-Parul University
+Parul University
+
+Project
+
+TEAM-43 — Brain Tumor Detection Using Deep Learning (VGG16 + Flask)
