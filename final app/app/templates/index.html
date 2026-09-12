@@ -2,8 +2,13 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Dk's Tumor Detection System</title>
 
@@ -13,9 +18,13 @@
     >
 
     <style>
+
         body {
+
             font-family: Arial, sans-serif;
+
             min-height: 100vh;
+
             margin: 0;
 
             background-image:
@@ -26,177 +35,312 @@
                 url("https://images.newscientist.com/wp-content/uploads/2018/06/15100753/gettyimages-168715138.jpg");
 
             background-size: cover;
+
             background-position: center;
+
             background-attachment: fixed;
+
             color: white;
         }
 
+
         .container {
+
             padding-top: 35px;
+
             padding-bottom: 40px;
         }
 
+
         .glass-card {
+
             background: rgba(255, 255, 255, 0.15);
+
             backdrop-filter: blur(12px);
+
             -webkit-backdrop-filter: blur(12px);
+
             border: 1px solid rgba(255, 255, 255, 0.25);
+
             border-radius: 20px;
+
             padding: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+
+            box-shadow:
+                0 8px 32px
+                rgba(0, 0, 0, 0.3);
         }
 
+
         .title {
+
             font-weight: bold;
+
             margin-bottom: 8px;
         }
 
+
         .lead {
+
             opacity: 0.9;
         }
 
+
         .stat-card {
+
             background: rgba(0, 0, 0, 0.20);
+
             border-radius: 15px;
+
             padding: 20px;
+
             text-align: center;
+
             height: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.15);
+
+            border:
+                1px solid
+                rgba(255, 255, 255, 0.15);
         }
 
+
         .stat-number {
+
             font-size: 30px;
+
             font-weight: bold;
         }
 
+
         .stat-title {
+
             font-size: 14px;
+
             opacity: 0.85;
         }
 
+
         .breakdown-card {
+
             background: rgba(0, 0, 0, 0.18);
+
             border-radius: 12px;
+
             padding: 15px;
+
             text-align: center;
         }
+
 
         .form-control,
         .form-select {
+
             border-radius: 10px;
+
             border: none;
+
             padding: 11px;
         }
 
+
         .form-label {
+
             font-weight: bold;
         }
 
+
         .btn-pink {
+
             background: #ff7eb3;
+
             border: none;
+
             color: white;
+
             font-weight: bold;
+
             border-radius: 10px;
+
             padding: 12px 25px;
         }
 
+
         .btn-pink:hover {
+
             background: #ff5585;
+
             color: white;
         }
 
+
         .result-card {
+
             background: rgba(0, 0, 0, 0.20);
+
             border-radius: 15px;
+
             padding: 25px;
+
             margin-top: 25px;
         }
 
+
         .result-title {
+
             font-size: 25px;
+
             font-weight: bold;
         }
 
+
+        /* =========================
+           Uploaded MRI Image
+           ========================= */
+
         .uploaded-image {
+
+            display: block;
+
             max-width: 100%;
+
+            width: auto;
+
+            height: auto;
+
             max-height: 400px;
+
             object-fit: contain;
+
             border-radius: 15px;
-            margin-top: 15px;
+
+            margin: 15px auto 0 auto;
+
             background: rgba(0, 0, 0, 0.2);
+
             padding: 8px;
         }
 
+
         .history-card {
+
             margin-top: 30px;
+
             background: rgba(0, 0, 0, 0.20);
+
             border-radius: 15px;
+
             padding: 20px;
         }
 
+
         .table {
+
             color: white;
+
             margin-bottom: 0;
         }
 
+
         .table th,
         .table td {
+
             color: white;
+
             vertical-align: middle;
         }
 
+
         .table thead th {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+
+            border-bottom:
+                1px solid
+                rgba(255, 255, 255, 0.3);
         }
+
 
         .table tbody td {
-            border-color: rgba(255, 255, 255, 0.15);
+
+            border-color:
+                rgba(255, 255, 255, 0.15);
         }
 
+
         .search-box {
+
             background: rgba(255, 255, 255, 0.12);
+
             border-radius: 10px;
+
             padding: 15px;
         }
 
+
         #loadingMessage {
+
             display: none;
+
             margin-top: 15px;
+
             font-weight: bold;
         }
 
+
         .footer {
+
             text-align: center;
+
             margin-top: 30px;
+
             font-size: 14px;
+
             opacity: 0.8;
         }
+
 
         @media (max-width: 768px) {
 
             .glass-card {
+
                 padding: 20px;
             }
 
+
             .table-responsive {
+
                 font-size: 13px;
             }
 
+
             .stat-number {
+
                 font-size: 24px;
             }
+
+
+            .uploaded-image {
+
+                max-height: 300px;
+            }
+
         }
+
     </style>
+
 </head>
+
 
 <body>
 
+
 <div class="container">
+
 
     <div class="glass-card">
 
-        <!-- Header -->
+
+        <!-- =========================
+             Header
+             ========================= -->
 
         <div class="text-center mb-4">
 
@@ -211,12 +355,17 @@
         </div>
 
 
-        <!-- Dashboard -->
+        <!-- =========================
+             Dashboard
+             ========================= -->
 
         <div class="row g-3 mb-4">
 
+
             <div class="col-md-3 col-6">
+
                 <div class="stat-card">
+
                     <div class="stat-number">
                         {{ total_scans }}
                     </div>
@@ -224,12 +373,16 @@
                     <div class="stat-title">
                         Total Scans
                     </div>
+
                 </div>
+
             </div>
 
 
             <div class="col-md-3 col-6">
+
                 <div class="stat-card">
+
                     <div class="stat-number">
                         {{ tumor_cases }}
                     </div>
@@ -237,12 +390,16 @@
                     <div class="stat-title">
                         Tumor Cases
                     </div>
+
                 </div>
+
             </div>
 
 
             <div class="col-md-3 col-6">
+
                 <div class="stat-card">
+
                     <div class="stat-number">
                         {{ no_tumor_cases }}
                     </div>
@@ -250,69 +407,102 @@
                     <div class="stat-title">
                         No Tumor Cases
                     </div>
+
                 </div>
+
             </div>
 
 
             <div class="col-md-3 col-6">
+
                 <div class="stat-card">
+
                     <div class="stat-number">
+
                         {{ accuracy }}
 
                         {% if accuracy != "N/A" %}
                             %
                         {% endif %}
+
                     </div>
 
                     <div class="stat-title">
                         Model Accuracy
                     </div>
+
                 </div>
+
             </div>
+
 
         </div>
 
 
-        <!-- Tumor Breakdown -->
+        <!-- =========================
+             Tumor Breakdown
+             ========================= -->
 
         <div class="row g-3 mb-4">
 
+
             <div class="col-md-4">
+
                 <div class="breakdown-card">
-                    <strong>Glioma</strong>
+
+                    <strong>
+                        Glioma
+                    </strong>
 
                     <div class="fs-4">
                         {{ glioma_cases }}
                     </div>
+
                 </div>
+
             </div>
 
 
             <div class="col-md-4">
+
                 <div class="breakdown-card">
-                    <strong>Meningioma</strong>
+
+                    <strong>
+                        Meningioma
+                    </strong>
 
                     <div class="fs-4">
                         {{ meningioma_cases }}
                     </div>
+
                 </div>
+
             </div>
 
 
             <div class="col-md-4">
+
                 <div class="breakdown-card">
-                    <strong>Pituitary</strong>
+
+                    <strong>
+                        Pituitary
+                    </strong>
 
                     <div class="fs-4">
                         {{ pituitary_cases }}
                     </div>
+
                 </div>
+
             </div>
+
 
         </div>
 
 
-        <!-- Upload Form -->
+        <!-- =========================
+             Upload Form
+             ========================= -->
 
         <form
             action="{{ url_for('index') }}"
@@ -321,7 +511,11 @@
             id="uploadForm"
         >
 
+
             <div class="row">
+
+
+                <!-- Patient Name -->
 
                 <div class="col-md-6 mb-3">
 
@@ -340,6 +534,8 @@
                 </div>
 
 
+                <!-- Patient ID -->
+
                 <div class="col-md-6 mb-3">
 
                     <label class="form-label">
@@ -356,6 +552,8 @@
 
                 </div>
 
+
+                <!-- Age -->
 
                 <div class="col-md-6 mb-3">
 
@@ -375,6 +573,8 @@
 
                 </div>
 
+
+                <!-- Gender -->
 
                 <div class="col-md-6 mb-3">
 
@@ -409,6 +609,8 @@
                 </div>
 
 
+                <!-- MRI File -->
+
                 <div class="col-12 mb-3">
 
                     <label class="form-label">
@@ -425,8 +627,11 @@
 
                 </div>
 
+
             </div>
 
+
+            <!-- Analyze Button -->
 
             <div class="text-center">
 
@@ -441,6 +646,8 @@
             </div>
 
 
+            <!-- Loading -->
+
             <div
                 id="loadingMessage"
                 class="text-center"
@@ -448,10 +655,13 @@
                 Analyzing MRI image... Please wait.
             </div>
 
+
         </form>
 
 
-        <!-- Flash Messages -->
+        <!-- =========================
+             Flash Messages
+             ========================= -->
 
         {% with messages = get_flashed_messages() %}
 
@@ -462,7 +672,9 @@
                     {% for message in messages %}
 
                         <div class="alert alert-warning">
+
                             {{ message }}
+
                         </div>
 
                     {% endfor %}
@@ -474,40 +686,80 @@
         {% endwith %}
 
 
-        <!-- Result -->
+        <!-- =========================
+             Detection Result
+             ========================= -->
 
         {% if result %}
 
         <div class="result-card text-center">
 
+
             <h3>
                 Detection Result
             </h3>
 
+
             <div class="result-title">
+
                 {{ result }}
+
             </div>
 
+
             <p class="mt-2">
+
                 Confidence:
-                <strong>{{ confidence }}%</strong>
+
+                <strong>
+                    {{ confidence }}
+                </strong>
+
             </p>
 
 
+            <!-- =========================
+                 Uploaded MRI
+                 ========================= -->
+
             {% if file_path %}
 
-                <img
-                    src="{{ url_for('get_uploaded_file', filename=file_path) }}"
-                    alt="Uploaded MRI"
-                    class="uploaded-image"
-                >
+                <div class="mt-3">
+
+                    <h5>
+                        Uploaded MRI
+                    </h5>
+
+
+                    <img
+                        src="{{ url_for('get_uploaded_file', filename=file_path) }}"
+                        alt="Uploaded MRI"
+                        class="uploaded-image"
+                        onerror="this.style.display='none'; document.getElementById('imageError').style.display='block';"
+                    >
+
+
+                    <div
+                        id="imageError"
+                        class="alert alert-danger mt-3"
+                        style="display:none;"
+                    >
+                        Unable to load the uploaded MRI image.
+                    </div>
+
+                </div>
 
             {% endif %}
 
 
+            <!-- =========================
+                 Scan Actions
+                 ========================= -->
+
             {% if scan_id %}
 
                 <div class="mt-4">
+
 
                     <a
                         href="{{ url_for('view_scan', scan_id=scan_id) }}"
@@ -516,6 +768,7 @@
                         View Scan
                     </a>
 
+
                     <a
                         href="{{ url_for('download_report', scan_id=scan_id) }}"
                         class="btn btn-success"
@@ -523,20 +776,27 @@
                         Download Report
                     </a>
 
+
                 </div>
 
             {% endif %}
+
 
         </div>
 
         {% endif %}
 
 
-        <!-- Previous Scans -->
+        <!-- =========================
+             Previous Scans
+             ========================= -->
 
         <div class="history-card">
 
-            <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+
+            <div
+                class="d-flex justify-content-between align-items-center flex-wrap mb-3"
+            >
 
                 <h3 class="mb-2">
                     Previous Scans
@@ -555,6 +815,7 @@
 
                 <div class="row g-2">
 
+
                     <div class="col-md-9">
 
                         <input
@@ -567,6 +828,7 @@
 
                     </div>
 
+
                     <div class="col-md-3">
 
                         <button
@@ -578,6 +840,7 @@
 
                     </div>
 
+
                 </div>
 
             </form>
@@ -585,21 +848,49 @@
 
             {% if scans %}
 
+
             <div class="table-responsive">
 
+
                 <table class="table table-hover">
+
 
                     <thead>
 
                         <tr>
-                            <th>Date</th>
-                            <th>Patient</th>
-                            <th>Patient ID</th>
-                            <th>Age</th>
-                            <th>Gender</th>
-                            <th>Result</th>
-                            <th>Confidence</th>
-                            <th>Actions</th>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                Patient
+                            </th>
+
+                            <th>
+                                Patient ID
+                            </th>
+
+                            <th>
+                                Age
+                            </th>
+
+                            <th>
+                                Gender
+                            </th>
+
+                            <th>
+                                Result
+                            </th>
+
+                            <th>
+                                Confidence
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
                         </tr>
 
                     </thead>
@@ -607,39 +898,50 @@
 
                     <tbody>
 
+
                     {% for scan in scans %}
 
+
                         <tr>
+
 
                             <td>
                                 {{ scan.date }}
                             </td>
 
+
                             <td>
                                 {{ scan.patient_name }}
                             </td>
+
 
                             <td>
                                 {{ scan.patient_id }}
                             </td>
 
+
                             <td>
                                 {{ scan.age }}
                             </td>
+
 
                             <td>
                                 {{ scan.gender }}
                             </td>
 
+
                             <td>
                                 {{ scan.result }}
                             </td>
 
-                            <td>
-                                {{ scan.confidence }}%
-                            </td>
 
                             <td>
+                                {{ scan.confidence }}
+                            </td>
+
+
+                            <td>
+
 
                                 <a
                                     href="{{ url_for('view_scan', scan_id=scan.id) }}"
@@ -648,12 +950,14 @@
                                     View
                                 </a>
 
+
                                 <a
                                     href="{{ url_for('download_report', scan_id=scan.id) }}"
                                     class="btn btn-sm btn-success mb-1"
                                 >
                                     PDF
                                 </a>
+
 
                                 <form
                                     action="{{ url_for('delete_scan', scan_id=scan.id) }}"
@@ -662,6 +966,7 @@
                                     onsubmit="return confirm('Are you sure you want to delete this scan?');"
                                 >
 
+
                                     <button
                                         type="submit"
                                         class="btn btn-sm btn-danger mb-1"
@@ -669,74 +974,111 @@
                                         Delete
                                     </button>
 
+
                                 </form>
+
 
                             </td>
 
+
                         </tr>
+
 
                     {% endfor %}
 
+
                     </tbody>
+
 
                 </table>
 
+
             </div>
+
 
             {% else %}
 
+
                 <div class="text-center py-4">
+
                     No previous scans found.
+
                 </div>
+
 
             {% endif %}
 
+
         </div>
+
 
     </div>
 
 
-    <!-- Footer -->
+    <!-- =========================
+         Footer
+         ========================= -->
 
     <div class="footer">
+
 
         <div>
             © 2026 Brain Tumor Detection. All Rights Reserved.
         </div>
 
+
         <div>
             Team IT 43 Parul University
         </div>
 
+
     </div>
+
 
 </div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Bootstrap -->
 
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+></script>
+
+
+<!-- =========================
+     Loading Script
+     ========================= -->
 
 <script>
 
-    document
-        .getElementById("uploadForm")
-        .addEventListener("submit", function () {
+    const uploadForm =
+        document.getElementById("uploadForm");
 
-            const button =
-                document.getElementById("analyzeButton");
+    const analyzeButton =
+        document.getElementById("analyzeButton");
 
-            const loading =
-                document.getElementById("loadingMessage");
+    const loadingMessage =
+        document.getElementById("loadingMessage");
 
-            button.disabled = true;
 
-            button.innerText = "Analyzing MRI...";
+    uploadForm.addEventListener(
+        "submit",
+        function () {
 
-            loading.style.display = "block";
+            analyzeButton.disabled = true;
 
-        });
+            analyzeButton.innerText =
+                "Analyzing MRI...";
+
+            loadingMessage.style.display =
+                "block";
+
+        }
+    );
 
 </script>
 
+
 </body>
+
 </html>
