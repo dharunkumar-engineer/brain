@@ -86,6 +86,10 @@
         }
 
 
+        /* =========================
+           Dashboard Statistics
+           ========================= */
+
         .stat-card {
 
             background: rgba(0, 0, 0, 0.20);
@@ -120,6 +124,10 @@
         }
 
 
+        /* =========================
+           Tumor Breakdown
+           ========================= */
+
         .breakdown-card {
 
             background: rgba(0, 0, 0, 0.18);
@@ -131,6 +139,10 @@
             text-align: center;
         }
 
+
+        /* =========================
+           Form
+           ========================= */
 
         .form-control,
         .form-select {
@@ -148,6 +160,10 @@
             font-weight: bold;
         }
 
+
+        /* =========================
+           Pink Button
+           ========================= */
 
         .btn-pink {
 
@@ -172,6 +188,10 @@
             color: white;
         }
 
+
+        /* =========================
+           Result
+           ========================= */
 
         .result-card {
 
@@ -221,6 +241,10 @@
         }
 
 
+        /* =========================
+           Previous Scans
+           ========================= */
+
         .history-card {
 
             margin-top: 30px;
@@ -265,6 +289,10 @@
         }
 
 
+        /* =========================
+           Search
+           ========================= */
+
         .search-box {
 
             background: rgba(255, 255, 255, 0.12);
@@ -275,6 +303,10 @@
         }
 
 
+        /* =========================
+           Loading
+           ========================= */
+
         #loadingMessage {
 
             display: none;
@@ -284,6 +316,10 @@
             font-weight: bold;
         }
 
+
+        /* =========================
+           Footer
+           ========================= */
 
         .footer {
 
@@ -296,6 +332,10 @@
             opacity: 0.8;
         }
 
+
+        /* =========================
+           Mobile
+           ========================= */
 
         @media (max-width: 768px) {
 
@@ -362,6 +402,8 @@
         <div class="row g-3 mb-4">
 
 
+            <!-- Total Scans -->
+
             <div class="col-md-3 col-6">
 
                 <div class="stat-card">
@@ -378,6 +420,8 @@
 
             </div>
 
+
+            <!-- Tumor Cases -->
 
             <div class="col-md-3 col-6">
 
@@ -396,6 +440,8 @@
             </div>
 
 
+            <!-- No Tumor Cases -->
+
             <div class="col-md-3 col-6">
 
                 <div class="stat-card">
@@ -413,18 +459,14 @@
             </div>
 
 
+            <!-- Model Accuracy -->
+
             <div class="col-md-3 col-6">
 
                 <div class="stat-card">
 
                     <div class="stat-number">
-
-                        {{ accuracy }}
-
-                        {% if accuracy != "96.9" %}
-                            %
-                        {% endif %}
-
+                        {{ accuracy }}%
                     </div>
 
                     <div class="stat-title">
@@ -446,6 +488,8 @@
         <div class="row g-3 mb-4">
 
 
+            <!-- Glioma -->
+
             <div class="col-md-4">
 
                 <div class="breakdown-card">
@@ -463,6 +507,8 @@
             </div>
 
 
+            <!-- Meningioma -->
+
             <div class="col-md-4">
 
                 <div class="breakdown-card">
@@ -479,6 +525,8 @@
 
             </div>
 
+
+            <!-- Pituitary -->
 
             <div class="col-md-4">
 
@@ -631,7 +679,9 @@
             </div>
 
 
-            <!-- Analyze Button -->
+            <!-- =========================
+                 Analyze Button
+                 ========================= -->
 
             <div class="text-center">
 
@@ -989,7 +1039,6 @@
 
                     </tbody>
 
-
                 </table>
 
 
@@ -1038,7 +1087,9 @@
 </div>
 
 
-<!-- Bootstrap -->
+<!-- =========================
+     Bootstrap
+     ========================= -->
 
 <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
